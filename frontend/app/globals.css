@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Theme tokens.
+ *
+ * Screen 1 (Login) matches the Figma design exactly.
+ * Theme variables live here so future screens can extend or
+ * swap palettes without touching component code.
+ */
+:root {
+  /* Light theme (current design) */
+  --color-background: 249 250 251;   /* #F9FAFB */
+  --color-surface: 255 255 255;      /* #FFFFFF */
+  --color-foreground: 17 24 39;      /* #111827 */
+  --color-muted: 243 244 246;        /* #F3F4F6 */
+  --color-muted-foreground: 107 114 128; /* #6B7280 */
+  --color-border: 229 231 235;       /* #E5E7EB */
+  --color-primary: 17 24 39;         /* #111827 */
+  --color-primary-foreground: 255 255 255; /* #FFFFFF */
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
