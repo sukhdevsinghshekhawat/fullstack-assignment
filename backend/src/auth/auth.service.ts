@@ -1,23 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { UsersService } from '../users/users.service';
+import { guestSessions } from './session-store';
 import type { User } from '@prisma/client';
 
 export interface GuestSession {
   user: User;
   sessionToken: string;
 }
-
-/**
- * In-memory session store for guest sessions.
- *
- * For Screen 1 this is sufficient and keeps the deployment
- * dependency-free (no Redis required). Each guest token maps to
- * a user. When real auth (email + Google OAuth) is added, this
- * can be swapped for a Session table or a JWT strategy without
- * changing the controller contract.
- */
-const guestSessions = new Map<string, string>(); // sessionToken -> userId
 
 @Injectable()
 export class AuthService {
@@ -36,8 +26,10 @@ export class AuthService {
           return { user, sessionToken: existingToken };
         }
       }
-      // Token was presented but is invalid/expired.
-      throw new UnauthorizedException('Invalid session token');
+      // Token was presented but is invalid/expired (e.g. the backend
+      // restarted and the in-memory store was cleared). Instead of
+      // failing with 401, fall through and create a fresh guest session
+      // so the user can continue seamlessly.
     }
 
     const user = await this.usersService.createGuestUser();
