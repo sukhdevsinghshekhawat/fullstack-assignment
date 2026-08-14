@@ -1,7 +1,6 @@
 // Prisma schema for the Task Management System.
-// Only the User model is needed for Screen 1 (guest login).
-// Additional models (Task, Project, ...) will be added as more
-// Figma screens are implemented.
+// Screen 1: User model (guest login).
+// Screen 2: Task, Label, TaskLabel, TaskMember models + enums.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,6 +11,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ---------- Enums ----------
+
+enum TaskStatus {
+  TODO
+  DOING
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskPriority {
+  NO_PRIORITY
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// ---------- Models ----------
+
 model User {
   id        String   @id @default(uuid()) @db.Uuid
   email     String?  @unique
@@ -20,5 +38,65 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  createdTasks Task[]       @relation("TaskCreator")
+  taskMembers  TaskMember[]
+  taskLabels   TaskLabel[]
+
   @@map("users")
+}
+
+model Task {
+  id          String       @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(NO_PRIORITY)
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  createdById String       @db.Uuid
+  createdBy   User         @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  members TaskMember[]
+  labels  TaskLabel[]
+
+  @@index([createdById, status])
+  @@index([createdById, priority])
+  @@map("tasks")
+}
+
+model TaskMember {
+  id     String @id @default(uuid()) @db.Uuid
+  taskId String @db.Uuid
+  userId String @db.Uuid
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@map("task_members")
+}
+
+model Label {
+  id   String @id @default(uuid()) @db.Uuid
+  name String @unique
+
+  tasks TaskLabel[]
+
+  @@map("labels")
+}
+
+model TaskLabel {
+  id      String @id @default(uuid()) @db.Uuid
+  taskId  String @db.Uuid
+  labelId String @db.Uuid
+  userId  String @db.Uuid
+
+  task  Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, labelId])
+  @@map("task_labels")
 }

@@ -10,8 +10,7 @@ import {
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GuestLoginDto } from './dto/guest-login.dto';
-
-const SESSION_COOKIE = 'taskflow_session';
+import { SESSION_COOKIE } from './guards/session.guard';
 
 @Controller('auth')
 export class AuthController {

@@ -19,7 +19,7 @@ export function LoginCard() {
     setError(null);
     try {
       await loginAsGuest();
-      router.push('/dashboard');
+      router.push('/tasks');
     } catch (err) {
       const apiError = err as ApiError;
       setError(
