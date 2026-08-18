@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import type { CreateTaskDto, QueryTaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, QueryTaskDto, UpdateTaskDto } from './dto';
 import type { AuthenticatedRequest } from '../auth/guards/session.guard';
 import { SessionGuard } from '../auth/guards/session.guard';
 
