@@ -1,8 +1,15 @@
 import { apiRequest } from '@/lib/api';
 import type {
+  CreateCommentInput,
+  CreateResourceInput,
   CreateTaskInput,
   Task,
+  TaskActivity,
+  TaskComment,
+  TaskMember,
   TaskQuery,
+  TaskResource,
+  Team,
   UpdateTaskInput,
 } from '@/types/task';
 
@@ -43,5 +50,97 @@ export function updateTask(
 export function deleteTask(id: string): Promise<{ id: string; deleted: boolean }> {
   return apiRequest<{ id: string; deleted: boolean }>(`/tasks/${id}`, {
     method: 'DELETE',
+  });
+}
+
+// ---------- Subtasks ----------
+
+export function getSubtasks(id: string): Promise<Task[]> {
+  return apiRequest<Task[]>(`/tasks/${id}/subtasks`);
+}
+
+// ---------- Comments ----------
+
+export function getComments(id: string): Promise<TaskComment[]> {
+  return apiRequest<TaskComment[]>(`/tasks/${id}/comments`);
+}
+
+export function createComment(
+  id: string,
+  input: CreateCommentInput,
+): Promise<TaskComment> {
+  return apiRequest<TaskComment>(`/tasks/${id}/comments`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+export function updateComment(
+  taskId: string,
+  commentId: string,
+  content: string,
+): Promise<TaskComment> {
+  return apiRequest<TaskComment>(`/tasks/${taskId}/comments/${commentId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ content }),
+  });
+}
+
+export function deleteComment(
+  taskId: string,
+  commentId: string,
+): Promise<{ id: string; deleted: boolean }> {
+  return apiRequest<{ id: string; deleted: boolean }>(
+    `/tasks/${taskId}/comments/${commentId}`,
+    { method: 'DELETE' },
+  );
+}
+
+// ---------- Resources ----------
+
+export function getResources(id: string): Promise<TaskResource[]> {
+  return apiRequest<TaskResource[]>(`/tasks/${id}/resources`);
+}
+
+export function createResource(
+  id: string,
+  input: CreateResourceInput,
+): Promise<TaskResource> {
+  return apiRequest<TaskResource>(`/tasks/${id}/resources`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+export function deleteResource(
+  taskId: string,
+  resourceId: string,
+): Promise<{ id: string; deleted: boolean }> {
+  return apiRequest<{ id: string; deleted: boolean }>(
+    `/tasks/${taskId}/resources/${resourceId}`,
+    { method: 'DELETE' },
+  );
+}
+
+// ---------- Activity ----------
+
+export function getActivity(id: string): Promise<TaskActivity[]> {
+  return apiRequest<TaskActivity[]>(`/tasks/${id}/activity`);
+}
+
+// ---------- Members & Teams ----------
+
+export function getWorkspaceMembers(): Promise<TaskMember[]> {
+  return apiRequest<TaskMember[]>('/tasks/members');
+}
+
+export function getTeams(): Promise<Team[]> {
+  return apiRequest<Team[]>('/tasks/teams');
+}
+
+export function createTeam(name: string): Promise<Team> {
+  return apiRequest<Team>('/tasks/teams', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
   });
 }

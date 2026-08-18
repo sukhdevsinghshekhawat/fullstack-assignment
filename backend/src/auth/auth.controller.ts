@@ -1,20 +1,39 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GuestLoginDto } from './dto/guest-login.dto';
-import { SESSION_COOKIE } from './guards/session.guard';
+import { SESSION_COOKIE, SessionGuard } from './guards/session.guard';
+import type { AuthenticatedRequest } from './guards/session.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  /**
+   * GET /auth/me
+   *
+   * Returns the currently authenticated user from the session cookie.
+   */
+  @Get('me')
+  @UseGuards(SessionGuard)
+  me(@Req() req: AuthenticatedRequest) {
+    return {
+      id: req.user!.id,
+      email: req.user!.email,
+      name: req.user!.name,
+      isGuest: req.user!.isGuest,
+    };
+  }
 
   /**
    * POST /auth/guest

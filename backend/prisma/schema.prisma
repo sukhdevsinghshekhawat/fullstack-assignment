@@ -1,6 +1,7 @@
 // Prisma schema for the Task Management System.
 // Screen 1: User model (guest login).
 // Screen 2: Task, Label, TaskLabel, TaskMember models + enums.
+// Screen 4: TaskResource, TaskComment, TaskActivity, Team models + parentTaskId, startDate, endDate.
 
 generator client {
   provider = "prisma-client-js"
@@ -41,8 +42,27 @@ model User {
   createdTasks Task[]       @relation("TaskCreator")
   taskMembers  TaskMember[]
   taskLabels   TaskLabel[]
+  comments     TaskComment[]
+  activities   TaskActivity[]
+  resources    TaskResource[]
+  teams        Team[]
 
   @@map("users")
+}
+
+model Team {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String @db.Uuid
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  @@index([createdById])
+  @@map("teams")
 }
 
 model Task {
@@ -52,17 +72,30 @@ model Task {
   status      TaskStatus   @default(TODO)
   priority    TaskPriority @default(NO_PRIORITY)
   dueDate     DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
+  parentTaskId String?     @db.Uuid
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   createdById String       @db.Uuid
   createdBy   User         @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
 
+  parentTask   Task?        @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subTasks     Task[]       @relation("SubTasks")
+  teamId       String?      @db.Uuid
+  team         Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
   members TaskMember[]
   labels  TaskLabel[]
+  comments TaskComment[]
+  activities TaskActivity[]
+  resources TaskResource[]
 
   @@index([createdById, status])
   @@index([createdById, priority])
+  @@index([parentTaskId])
+  @@index([createdAt])
   @@map("tasks")
 }
 
@@ -75,6 +108,7 @@ model TaskMember {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, userId])
+  @@index([userId])
   @@map("task_members")
 }
 
@@ -98,5 +132,63 @@ model TaskLabel {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, labelId])
+  @@index([userId])
   @@map("task_labels")
+}
+
+model TaskResource {
+  id          String   @id @default(uuid()) @db.Uuid
+  taskId      String   @db.Uuid
+  userId      String   @db.Uuid
+  name        String
+  url         String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@map("task_resources")
+}
+
+model TaskComment {
+  id              String    @id @default(uuid()) @db.Uuid
+  taskId          String    @db.Uuid
+  userId          String    @db.Uuid
+  content         String
+  parentCommentId String?   @db.Uuid
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  task   Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent TaskComment? @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies TaskComment[] @relation("CommentReplies")
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([parentCommentId])
+  @@index([createdAt])
+  @@map("task_comments")
+}
+
+model TaskActivity {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @db.Uuid
+  userId    String   @db.Uuid
+  type      String
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("task_activities")
 }
