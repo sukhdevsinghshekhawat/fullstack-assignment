@@ -33,6 +33,22 @@ export class UpdateTaskDto {
   dueDate?: string;
 
   @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  parentTaskId?: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  teamId?: string;
+
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   memberIds?: string[];

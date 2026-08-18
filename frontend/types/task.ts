@@ -12,6 +12,49 @@ export interface TaskLabel {
   name: string;
 }
 
+export interface Team {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  createdById: string;
+}
+
+export interface TaskResource {
+  id: string;
+  taskId: string;
+  userId: string;
+  name: string;
+  url: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user?: TaskMember;
+}
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  content: string;
+  parentCommentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: TaskMember;
+  replies: TaskComment[];
+}
+
+export interface TaskActivity {
+  id: string;
+  taskId: string;
+  userId: string;
+  type: string;
+  message: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  user: TaskMember;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -19,9 +62,15 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   dueDate: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  parentTaskId: string | null;
+  teamId: string | null;
   createdAt: string;
   updatedAt: string;
   createdById: string;
+  createdBy?: TaskMember;
+  team?: Team | null;
   members: { user: TaskMember }[];
   labels: { label: TaskLabel }[];
 }
@@ -32,6 +81,10 @@ export interface CreateTaskInput {
   status?: TaskStatus;
   priority?: TaskPriority;
   dueDate?: string;
+  startDate?: string;
+  endDate?: string;
+  parentTaskId?: string;
+  teamId?: string;
   memberIds?: string[];
   labels?: string[];
 }
@@ -42,6 +95,10 @@ export interface UpdateTaskInput {
   status?: TaskStatus;
   priority?: TaskPriority;
   dueDate?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  parentTaskId?: string | null;
+  teamId?: string | null;
   memberIds?: string[];
   labels?: string[];
 }
@@ -53,6 +110,17 @@ export interface TaskQuery {
   member?: string;
   label?: string;
   dueDate?: string;
+}
+
+export interface CreateCommentInput {
+  content: string;
+  parentCommentId?: string;
+}
+
+export interface CreateResourceInput {
+  name: string;
+  url: string;
+  description?: string;
 }
 
 export const TASK_STATUSES: { value: TaskStatus; label: string }[] = [

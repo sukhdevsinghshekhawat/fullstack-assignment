@@ -28,7 +28,47 @@ const taskInclude = {
       label: true,
     },
   },
+  team: true,
+  createdBy: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  },
 } satisfies Prisma.TaskInclude;
+
+const commentInclude = {
+  user: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  },
+  replies: {
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'asc' as const },
+  },
+} satisfies Prisma.TaskCommentInclude;
+
+const activityInclude = {
+  user: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  },
+} satisfies Prisma.TaskActivityInclude;
 
 @Injectable()
 export class TasksRepository {
@@ -37,6 +77,7 @@ export class TasksRepository {
   findMany(userId: string, query: TaskQuery = {}) {
     const where: Prisma.TaskWhereInput = {
       createdById: userId,
+      parentTaskId: null,
     };
 
     if (query.search) {
@@ -75,6 +116,14 @@ export class TasksRepository {
     });
   }
 
+  findSubtasks(parentId: string, userId: string) {
+    return this.prisma.task.findMany({
+      where: { parentTaskId: parentId, createdById: userId },
+      include: taskInclude,
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
   create(
     userId: string,
     data: {
@@ -83,6 +132,10 @@ export class TasksRepository {
       status?: TaskStatus;
       priority?: TaskPriority;
       dueDate?: Date;
+      startDate?: Date;
+      endDate?: Date;
+      parentTaskId?: string;
+      teamId?: string;
       memberIds?: string[];
       labels?: string[];
     },
@@ -94,6 +147,10 @@ export class TasksRepository {
         status: data.status,
         priority: data.priority,
         dueDate: data.dueDate,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        parentTaskId: data.parentTaskId,
+        teamId: data.teamId,
         createdById: userId,
         members: data.memberIds?.length
           ? {
@@ -127,6 +184,10 @@ export class TasksRepository {
       status?: TaskStatus;
       priority?: TaskPriority;
       dueDate?: Date | null;
+      startDate?: Date | null;
+      endDate?: Date | null;
+      parentTaskId?: string | null;
+      teamId?: string | null;
       memberIds?: string[];
       labels?: string[];
     },
@@ -146,6 +207,20 @@ export class TasksRepository {
         status: data.status,
         priority: data.priority,
         dueDate: data.dueDate,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        parentTask:
+          data.parentTaskId === null
+            ? { disconnect: true }
+            : data.parentTaskId
+              ? { connect: { id: data.parentTaskId } }
+              : undefined,
+        team:
+          data.teamId === null
+            ? { disconnect: true }
+            : data.teamId
+              ? { connect: { id: data.teamId } }
+              : undefined,
       };
 
       if (data.memberIds) {
@@ -198,6 +273,184 @@ export class TasksRepository {
       }
       await tx.task.delete({ where: { id } });
       return { id, deleted: true };
+    });
+  }
+
+  // ---------- Comments ----------
+
+  findComments(taskId: string, userId: string) {
+    return this.prisma.taskComment.findMany({
+      where: { taskId, parentCommentId: null },
+      include: commentInclude,
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  createComment(
+    taskId: string,
+    userId: string,
+    data: { content: string; parentCommentId?: string },
+  ) {
+    return this.prisma.taskComment.create({
+      data: {
+        taskId,
+        userId,
+        content: data.content,
+        parentCommentId: data.parentCommentId,
+      },
+      include: commentInclude,
+    });
+  }
+
+  updateComment(
+    taskId: string,
+    commentId: string,
+    userId: string,
+    content: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const comment = await tx.taskComment.findFirst({
+        where: { id: commentId, taskId, userId },
+      });
+      if (!comment) {
+        return null;
+      }
+      return tx.taskComment.update({
+        where: { id: commentId },
+        data: { content },
+        include: commentInclude,
+      });
+    });
+  }
+
+  deleteComment(taskId: string, commentId: string, userId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const comment = await tx.taskComment.findFirst({
+        where: { id: commentId, taskId, userId },
+      });
+      if (!comment) {
+        return null;
+      }
+      await tx.taskComment.delete({ where: { id: commentId } });
+      return { id: commentId, deleted: true };
+    });
+  }
+
+  // ---------- Resources ----------
+
+  findResources(taskId: string, userId: string) {
+    return this.prisma.taskResource.findMany({
+      where: { taskId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  createResource(
+    taskId: string,
+    userId: string,
+    data: { name: string; url: string; description?: string },
+  ) {
+    return this.prisma.taskResource.create({
+      data: {
+        taskId,
+        userId,
+        name: data.name,
+        url: data.url,
+        description: data.description,
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  }
+
+  deleteResource(taskId: string, resourceId: string, userId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const resource = await tx.taskResource.findFirst({
+        where: { id: resourceId, taskId, userId },
+      });
+      if (!resource) {
+        return null;
+      }
+      await tx.taskResource.delete({ where: { id: resourceId } });
+      return { id: resourceId, deleted: true };
+    });
+  }
+
+  // ---------- Activity ----------
+
+  findActivity(taskId: string, userId: string) {
+    return this.prisma.taskActivity.findMany({
+      where: { taskId },
+      include: activityInclude,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  createActivity(
+    taskId: string,
+    userId: string,
+    data: { type: string; message: string; metadata?: Prisma.InputJsonValue },
+  ) {
+    return this.prisma.taskActivity.create({
+      data: {
+        taskId,
+        userId,
+        type: data.type,
+        message: data.message,
+        metadata: data.metadata,
+      },
+      include: activityInclude,
+    });
+  }
+
+  // ---------- Teams ----------
+
+  findTeams(userId: string) {
+    return this.prisma.team.findMany({
+      where: { createdById: userId },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  createTeam(userId: string, name: string) {
+    return this.prisma.team.create({
+      data: { name, createdById: userId },
+    });
+  }
+
+  // ---------- Members ----------
+
+  findWorkspaceMembers(userId: string) {
+    // In this single-workspace model, the workspace is the user's own
+    // set of users. We return all users that share tasks with the
+    // authenticated user, plus the user themselves.
+    return this.prisma.user.findMany({
+      where: {
+        OR: [
+          { id: userId },
+          {
+            taskMembers: {
+              some: {
+                task: { createdById: userId },
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+      orderBy: { name: 'asc' },
     });
   }
 }
