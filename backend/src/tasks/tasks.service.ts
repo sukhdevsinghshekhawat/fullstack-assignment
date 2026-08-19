@@ -41,6 +41,11 @@ export class TasksService {
       }
     }
 
+    // If projectId is provided, verify the project belongs to the user.
+    if (dto.projectId) {
+      await this.verifyProject(userId, dto.projectId);
+    }
+
     // Verify member IDs belong to the workspace.
     await this.verifyMembers(userId, dto.memberIds);
 
@@ -71,6 +76,11 @@ export class TasksService {
   async update(id: string, userId: string, dto: UpdateTaskDto) {
     // Validate date range.
     this.validateDateRange(dto.startDate, dto.endDate);
+
+    // If projectId is provided, verify the project belongs to the user.
+    if (dto.projectId) {
+      await this.verifyProject(userId, dto.projectId);
+    }
 
     // Verify member IDs belong to the workspace.
     await this.verifyMembers(userId, dto.memberIds);
@@ -269,6 +279,13 @@ export class TasksService {
       if (end < start) {
         throw new BadRequestException('endDate must be greater than or equal to startDate');
       }
+    }
+  }
+
+  private async verifyProject(userId: string, projectId: string) {
+    const project = await this.tasksRepository.findProjectById(projectId, userId);
+    if (!project) {
+      throw new BadRequestException('Project not found or not owned by user');
     }
   }
 

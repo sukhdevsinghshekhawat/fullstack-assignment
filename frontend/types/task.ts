@@ -65,6 +65,7 @@ export interface Task {
   startDate: string | null;
   endDate: string | null;
   parentTaskId: string | null;
+  projectId: string | null;
   teamId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -84,6 +85,7 @@ export interface CreateTaskInput {
   startDate?: string;
   endDate?: string;
   parentTaskId?: string;
+  projectId?: string;
   teamId?: string;
   memberIds?: string[];
   labels?: string[];
@@ -98,6 +100,7 @@ export interface UpdateTaskInput {
   startDate?: string | null;
   endDate?: string | null;
   parentTaskId?: string | null;
+  projectId?: string | null;
   teamId?: string | null;
   memberIds?: string[];
   labels?: string[];

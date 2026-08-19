@@ -26,6 +26,18 @@ async function main() {
     labels.set(name, label.id);
   }
 
+  // Seed a project.
+  const project = await prisma.project.create({
+    data: {
+      name: 'TaskFlow Mobile App',
+      description: 'Build the mobile application for TaskFlow.',
+      priority: TaskPriority.HIGH,
+      dueDate: new Date('2026-09-12'),
+      leadId: guest.id,
+      createdById: guest.id,
+    },
+  });
+
   // Seed tasks distributed across statuses.
   const tasks = [
     {
@@ -103,6 +115,7 @@ async function main() {
         priority: task.priority,
         dueDate: task.dueDate,
         createdById: guest.id,
+        projectId: project.id,
         members: {
           create: [{ userId: guest.id }],
         },
@@ -116,7 +129,7 @@ async function main() {
     });
   }
 
-  console.log('Seed complete: 8 tasks created for guest user.');
+  console.log('Seed complete: 1 project and 8 tasks created for guest user.');
 }
 
 main()

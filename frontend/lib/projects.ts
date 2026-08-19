@@ -5,6 +5,7 @@ import type {
   ProjectQuery,
   UpdateProjectInput,
 } from '@/types/project';
+import type { Task, TaskQuery } from '@/types/task';
 
 export function getProjects(query: ProjectQuery = {}): Promise<Project[]> {
   const params = new URLSearchParams();
@@ -41,6 +42,15 @@ export function deleteProject(id: string): Promise<{ id: string; deleted: boolea
   });
 }
 
-export function getProjectTasks(id: string): Promise<any[]> {
-  return apiRequest<any[]>(`/projects/${id}/tasks`);
+export function getProjectTasks(id: string, query: TaskQuery = {}): Promise<Task[]> {
+  const params = new URLSearchParams();
+  if (query.search) params.set('search', query.search);
+  if (query.status) params.set('status', query.status);
+  if (query.priority) params.set('priority', query.priority);
+  if (query.member) params.set('member', query.member);
+  if (query.label) params.set('label', query.label);
+  if (query.dueDate) params.set('dueDate', query.dueDate);
+
+  const qs = params.toString();
+  return apiRequest<Task[]>(`/projects/${id}/tasks${qs ? `?${qs}` : ''}`);
 }

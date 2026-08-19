@@ -10,10 +10,11 @@ interface TaskModalProps {
   onClose: () => void;
   task?: Task | null;
   defaultStatus?: TaskStatus;
+  defaultProjectId?: string;
   onSubmit: (input: CreateTaskInput | UpdateTaskInput) => Promise<void>;
 }
 
-export function TaskModal({ visible, onClose, task, defaultStatus, onSubmit }: TaskModalProps) {
+export function TaskModal({ visible, onClose, task, defaultStatus, defaultProjectId, onSubmit }: TaskModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<TaskStatus>('TODO');
@@ -50,6 +51,7 @@ export function TaskModal({ visible, onClose, task, defaultStatus, onSubmit }: T
         status,
         priority,
         dueDate: dueDate || undefined,
+        projectId: task?.projectId ?? defaultProjectId,
       };
       await onSubmit(input);
       onClose();
