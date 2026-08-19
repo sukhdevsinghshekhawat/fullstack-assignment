@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar } from 'lucide-react';
+import { Calendar, Plus } from 'lucide-react';
 import Link from 'next/link';
 import type { Task } from '@/types/task';
 import type { FieldVisibility } from './TaskFieldsMenu';
@@ -60,10 +60,7 @@ export function TaskTableRow({ task, fields, onEdit, onDelete }: TaskTableRowPro
                 className="flex h-7 w-7 items-center justify-center rounded-full border border-dashed border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
                 aria-label="Add member"
               >
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <Plus className="h-3.5 w-3.5" />
               </button>
             )}
             {task.members && task.members.length > 2 && (

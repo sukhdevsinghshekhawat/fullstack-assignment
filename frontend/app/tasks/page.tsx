@@ -10,6 +10,7 @@ import { TaskFieldsMenu, type FieldVisibility } from '@/components/tasks/TaskFie
 import { TaskFilterMenu } from '@/components/tasks/TaskFilterMenu';
 import { TaskSearch } from '@/components/tasks/TaskSearch';
 import { TaskModal } from '@/components/tasks/TaskModal';
+import { TaskDeleteModal } from '@/components/tasks/TaskDeleteModal';
 import { getTasks, createTask, updateTask, deleteTask } from '@/lib/tasks';
 import type { Task, TaskQuery, TaskStatus, CreateTaskInput, UpdateTaskInput } from '@/types/task';
 import { useDebounce } from '@/lib/hooks';
@@ -40,6 +41,7 @@ function TasksContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultStatus, setDefaultStatus] = useState<TaskStatus | undefined>(undefined);
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchInput, 300);
 
@@ -100,24 +102,27 @@ function TasksContent() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
     try {
       await deleteTask(id);
       setTasks((prev) => prev.filter((t) => t.id !== id));
+      setDeleteTaskId(null);
     } catch (err) {
       setError('Failed to delete task.');
     }
   };
 
-  const handleFilter = (field: 'status' | 'priority', value: string) => {
+  const handleFilter = (field: 'status' | 'priority' | 'member' | 'label' | 'dueDate', value: string) => {
     setQuery((prev) => {
       const next = { ...prev };
       if (field === 'status') {
         if (next.status === value) delete next.status;
         else next.status = value as TaskStatus;
-      } else {
+      } else if (field === 'priority') {
         if (next.priority === value) delete next.priority;
         else next.priority = value as Task['priority'];
+      } else {
+        if (next[field] === value) delete next[field];
+        else next[field] = value;
       }
       return next;
     });
@@ -146,6 +151,12 @@ function TasksContent() {
       await handleCreate(input as CreateTaskInput);
     }
   };
+
+  const handleDeleteRequest = (id: string) => {
+    setDeleteTaskId(id);
+  };
+
+  const deleteTaskToDelete = tasks.find((t) => t.id === deleteTaskId);
 
   return (
     <AppShell>
@@ -235,7 +246,7 @@ function TasksContent() {
               tasks={tasks}
               fields={fields}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={handleDeleteRequest}
               onAddTask={handleAddTask}
             />
           </div>
@@ -277,6 +288,9 @@ function TasksContent() {
         selected={{
           status: query.status,
           priority: query.priority,
+          member: query.member,
+          label: query.label,
+          dueDate: query.dueDate,
         }}
         onSelect={handleFilter}
       />
@@ -288,6 +302,14 @@ function TasksContent() {
         task={editingTask}
         defaultStatus={defaultStatus}
         onSubmit={handleModalSubmit}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <TaskDeleteModal
+        visible={deleteTaskId !== null}
+        taskTitle={deleteTaskToDelete?.title ?? ''}
+        onClose={() => setDeleteTaskId(null)}
+        onConfirm={() => deleteTaskId && handleDelete(deleteTaskId)}
       />
     </AppShell>
   );

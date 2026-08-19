@@ -65,7 +65,13 @@ export function TaskListGroup({
       {/* Table */}
       {!collapsed && (
         <div className="mt-1">
-          <TaskTable tasks={tasks} fields={fields} onEdit={onEdit} onDelete={onDelete} />
+          <TaskTable
+            tasks={tasks}
+            fields={fields}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onAddTask={() => onAddTask(status)}
+          />
         </div>
       )}
     </div>
