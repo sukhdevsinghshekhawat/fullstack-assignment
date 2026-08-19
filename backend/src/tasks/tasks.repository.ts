@@ -116,6 +116,13 @@ export class TasksRepository {
     });
   }
 
+  findProjectById(projectId: string, userId: string) {
+    return this.prisma.project.findFirst({
+      where: { id: projectId, createdById: userId },
+      select: { id: true },
+    });
+  }
+
   findSubtasks(parentId: string, userId: string) {
     return this.prisma.task.findMany({
       where: { parentTaskId: parentId, createdById: userId },

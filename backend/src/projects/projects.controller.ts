@@ -16,6 +16,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryProjectDto } from './dto/query-project.dto';
+import { QueryTaskDto } from '../tasks/dto/query-task.dto';
 
 @Controller('projects')
 @UseGuards(SessionGuard)
@@ -33,8 +34,12 @@ export class ProjectsController {
   }
 
   @Get(':id/tasks')
-  findTasks(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
-    return this.projectsService.findTasks(id, req.user!.id);
+  findTasks(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Query() query: QueryTaskDto,
+  ) {
+    return this.projectsService.findTasks(id, req.user!.id, query);
   }
 
   @Post()

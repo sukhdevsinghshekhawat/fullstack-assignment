@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { TaskPriority } from '@prisma/client';
 import { ProjectsRepository, ProjectQuery } from './projects.repository';
+import { QueryTaskDto } from '../tasks/dto/query-task.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
@@ -76,11 +77,11 @@ export class ProjectsService {
     return result;
   }
 
-  async findTasks(projectId: string, userId: string) {
+  async findTasks(projectId: string, userId: string, query: QueryTaskDto = {}) {
     const project = await this.projectsRepository.findById(projectId, userId);
     if (!project) {
       throw new NotFoundException('Project not found');
     }
-    return this.projectsRepository.findTasks(projectId, userId);
+    return this.projectsRepository.findTasks(projectId, userId, query);
   }
 }

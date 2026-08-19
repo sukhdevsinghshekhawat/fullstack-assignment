@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, TaskPriority } from '@prisma/client';
+import { Prisma, TaskPriority, TaskStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { QueryTaskDto } from '../tasks/dto/query-task.dto';
 
 export interface ProjectQuery {
   search?: string;
@@ -147,9 +148,37 @@ export class ProjectsRepository {
     });
   }
 
-  findTasks(projectId: string, userId: string) {
+  findTasks(projectId: string, userId: string, query: QueryTaskDto = {}) {
+    const where: Prisma.TaskWhereInput = {
+      projectId,
+      createdById: userId,
+      parentTaskId: null,
+    };
+
+    if (query.search) {
+      where.title = { contains: query.search, mode: 'insensitive' };
+    }
+    if (query.status) {
+      where.status = query.status as TaskStatus;
+    }
+    if (query.priority) {
+      where.priority = query.priority;
+    }
+    if (query.member) {
+      where.members = { some: { userId: query.member } };
+    }
+    if (query.label) {
+      where.labels = { some: { label: { name: query.label } } };
+    }
+    if (query.dueDate) {
+      const start = new Date(query.dueDate);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 1);
+      where.dueDate = { gte: start, lt: end };
+    }
+
     return this.prisma.task.findMany({
-      where: { projectId, createdById: userId },
+      where,
       include: {
         members: { include: { user: true } },
         labels: { include: { label: true } },
