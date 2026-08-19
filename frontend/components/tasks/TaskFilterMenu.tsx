@@ -10,8 +10,11 @@ interface TaskFilterMenuProps {
   selected: {
     status?: TaskStatus;
     priority?: TaskPriority;
+    member?: string;
+    label?: string;
+    dueDate?: string;
   };
-  onSelect: (field: 'status' | 'priority', value: string) => void;
+  onSelect: (field: 'status' | 'priority' | 'member' | 'label' | 'dueDate', value: string) => void;
 }
 
 export function TaskFilterMenu({
@@ -90,6 +93,70 @@ export function TaskFilterMenu({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Member filter */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1 block">
+              Members
+            </label>
+            <input
+              type="text"
+              placeholder="Filter by member name or ID"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Filter by member"
+            />
+          </div>
+
+          {/* Due Date filter */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1 block">
+              Due Date
+            </label>
+            <input
+              type="date"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Filter by due date"
+            />
+          </div>
+
+          {/* Teams filter */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1 block">
+              Teams
+            </label>
+            <input
+              type="text"
+              placeholder="Filter by team"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Filter by team"
+            />
+          </div>
+
+          {/* Labels filter */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1 block">
+              Labels
+            </label>
+            <input
+              type="text"
+              placeholder="Filter by label"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Filter by label"
+            />
+          </div>
+
+          {/* Reporter filter */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1 block">
+              Reporter
+            </label>
+            <input
+              type="text"
+              placeholder="Filter by reporter"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              aria-label="Filter by reporter"
+            />
           </div>
         </div>
 
