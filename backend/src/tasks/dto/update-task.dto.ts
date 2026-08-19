@@ -49,6 +49,10 @@ export class UpdateTaskDto {
   teamId?: string;
 
   @IsOptional()
+  @IsUUID('4')
+  projectId?: string | null;
+
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   memberIds?: string[];

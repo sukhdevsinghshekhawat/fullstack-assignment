@@ -48,6 +48,10 @@ export class CreateTaskDto {
   teamId?: string;
 
   @IsOptional()
+  @IsUUID('4')
+  projectId?: string;
+
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   memberIds?: string[];
