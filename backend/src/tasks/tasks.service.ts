@@ -54,6 +54,7 @@ export class TasksService {
       endDate: dto.endDate ? new Date(dto.endDate) : undefined,
       parentTaskId: dto.parentTaskId,
       teamId: dto.teamId,
+      projectId: dto.projectId,
       memberIds: dto.memberIds,
       labels: dto.labels,
     });
@@ -84,6 +85,7 @@ export class TasksService {
       endDate: dto.endDate ? new Date(dto.endDate) : dto.endDate === null ? null : undefined,
       parentTaskId: dto.parentTaskId,
       teamId: dto.teamId,
+      projectId: dto.projectId,
       memberIds: dto.memberIds,
       labels: dto.labels,
     });

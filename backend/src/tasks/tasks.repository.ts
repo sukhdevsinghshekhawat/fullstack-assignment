@@ -136,41 +136,45 @@ export class TasksRepository {
       endDate?: Date;
       parentTaskId?: string;
       teamId?: string;
+      projectId?: string;
       memberIds?: string[];
       labels?: string[];
     },
   ) {
-    return this.prisma.task.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        priority: data.priority,
-        dueDate: data.dueDate,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        parentTaskId: data.parentTaskId,
-        teamId: data.teamId,
-        createdById: userId,
-        members: data.memberIds?.length
-          ? {
-              create: data.memberIds.map((memberId) => ({ userId: memberId })),
-            }
-          : undefined,
-        labels: data.labels?.length
-          ? {
-              create: data.labels.map((name) => ({
-                user: { connect: { id: userId } },
-                label: {
-                  connectOrCreate: {
-                    where: { name },
-                    create: { name },
-                  },
+    const createData: Prisma.TaskUncheckedCreateInput = {
+      title: data.title,
+      description: data.description,
+      status: data.status,
+      priority: data.priority,
+      dueDate: data.dueDate,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      parentTaskId: data.parentTaskId,
+      teamId: data.teamId,
+      projectId: data.projectId,
+      createdById: userId,
+      members: data.memberIds?.length
+        ? {
+            create: data.memberIds.map((memberId) => ({ userId: memberId })),
+          }
+        : undefined,
+      labels: data.labels?.length
+        ? {
+            create: data.labels.map((name) => ({
+              user: { connect: { id: userId } },
+              label: {
+                connectOrCreate: {
+                  where: { name },
+                  create: { name },
                 },
-              })),
-            }
-          : undefined,
-      },
+              },
+            })),
+          }
+        : undefined,
+    };
+
+    return this.prisma.task.create({
+      data: createData,
       include: taskInclude,
     });
   }
@@ -188,6 +192,7 @@ export class TasksRepository {
       endDate?: Date | null;
       parentTaskId?: string | null;
       teamId?: string | null;
+      projectId?: string | null;
       memberIds?: string[];
       labels?: string[];
     },
@@ -201,7 +206,7 @@ export class TasksRepository {
         return null;
       }
 
-      const updateData: Prisma.TaskUpdateInput = {
+      const updateData: Prisma.TaskUncheckedUpdateInput = {
         title: data.title,
         description: data.description,
         status: data.status,
@@ -209,18 +214,9 @@ export class TasksRepository {
         dueDate: data.dueDate,
         startDate: data.startDate,
         endDate: data.endDate,
-        parentTask:
-          data.parentTaskId === null
-            ? { disconnect: true }
-            : data.parentTaskId
-              ? { connect: { id: data.parentTaskId } }
-              : undefined,
-        team:
-          data.teamId === null
-            ? { disconnect: true }
-            : data.teamId
-              ? { connect: { id: data.teamId } }
-              : undefined,
+        parentTaskId: data.parentTaskId ?? undefined,
+        teamId: data.teamId ?? undefined,
+        projectId: data.projectId ?? undefined,
       };
 
       if (data.memberIds) {

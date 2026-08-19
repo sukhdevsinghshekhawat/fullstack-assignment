@@ -39,13 +39,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  createdTasks Task[]       @relation("TaskCreator")
-  taskMembers  TaskMember[]
-  taskLabels   TaskLabel[]
-  comments     TaskComment[]
-  activities   TaskActivity[]
-  resources    TaskResource[]
-  teams        Team[]
+  createdTasks   Task[]       @relation("TaskCreator")
+  taskMembers    TaskMember[]
+  taskLabels     TaskLabel[]
+  comments       TaskComment[]
+  activities     TaskActivity[]
+  resources      TaskResource[]
+  teams          Team[]
+  createdProjects Project[]    @relation("ProjectCreator")
+  leadProjects   Project[]    @relation("ProjectLead")
 
   @@map("users")
 }
@@ -65,6 +67,27 @@ model Team {
   @@map("teams")
 }
 
+model Project {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  priority    TaskPriority @default(NO_PRIORITY)
+  dueDate     DateTime?
+  leadId      String?      @db.Uuid
+  createdById String       @db.Uuid
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  lead      User? @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
+  createdBy User  @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  tasks     Task[]
+
+  @@index([createdById])
+  @@index([leadId])
+  @@index([createdAt])
+  @@map("projects")
+}
+
 model Task {
   id          String       @id @default(uuid()) @db.Uuid
   title       String
@@ -75,6 +98,7 @@ model Task {
   startDate   DateTime?
   endDate     DateTime?
   parentTaskId String?     @db.Uuid
+  projectId   String?      @db.Uuid
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -83,18 +107,20 @@ model Task {
 
   parentTask   Task?        @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
   subTasks     Task[]       @relation("SubTasks")
+  project      Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
   teamId       String?      @db.Uuid
   team         Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
-  members TaskMember[]
-  labels  TaskLabel[]
-  comments TaskComment[]
+  members   TaskMember[]
+  labels    TaskLabel[]
+  comments  TaskComment[]
   activities TaskActivity[]
   resources TaskResource[]
 
   @@index([createdById, status])
   @@index([createdById, priority])
   @@index([parentTaskId])
+  @@index([projectId])
   @@index([createdAt])
   @@map("tasks")
 }
