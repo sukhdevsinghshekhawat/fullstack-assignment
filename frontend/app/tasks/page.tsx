@@ -255,18 +255,18 @@ function TasksContent() {
         {/* Empty State */}
         {!loading && tasks.length === 0 && !error && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <svg className="h-12 w-12 text-muted-foreground/50 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            {/* <svg className="h-12 w-12 text-muted-foreground/50 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <line x1="9" y1="9" x2="15" y2="15" />
               <line x1="15" y1="9" x2="9" y2="15" />
-            </svg>
-            <p className="text-sm text-muted-foreground">No tasks found.</p>
+            </svg> */}
+            {/* <p className="text-sm text-muted-foreground">No tasks found.</p>
             <button
               onClick={() => handleAddTask()}
               className="mt-4 h-9 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
               + Add Task
-            </button>
+            </button> */}
           </div>
         )}
       </div>
