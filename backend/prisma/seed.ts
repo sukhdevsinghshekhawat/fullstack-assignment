@@ -6,11 +6,46 @@ async function main() {
   // Create a demo guest user for the seed.
   const guest = await prisma.user.upsert({
     where: { email: 'guest@taskflow.local' },
-    update: {},
+    update: {
+      fullName: 'Dexter',
+      title: 'Designer',
+      username: 'dexter',
+      avatarUrl: 'https://i.pravatar.cc/150?img=32',
+    },
     create: {
       email: 'guest@taskflow.local',
       name: 'Dexter',
+      fullName: 'Dexter',
+      title: 'Designer',
+      username: 'dexter',
+      avatarUrl: 'https://i.pravatar.cc/150?img=32',
       isGuest: true,
+    },
+  });
+
+  // Create a default workspace.
+  const workspace = await prisma.workspace.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000001' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000001',
+      name: 'TaskFlow Workspace',
+    },
+  });
+
+  // Add the guest user as owner of the workspace.
+  await prisma.workspaceMember.upsert({
+    where: {
+      workspaceId_userId: {
+        workspaceId: workspace.id,
+        userId: guest.id,
+      },
+    },
+    update: { role: 'OWNER' },
+    create: {
+      workspaceId: workspace.id,
+      userId: guest.id,
+      role: 'OWNER',
     },
   });
 
@@ -129,7 +164,7 @@ async function main() {
     });
   }
 
-  console.log('Seed complete: 1 project and 8 tasks created for guest user.');
+  console.log('Seed complete: 1 workspace, 1 project, and 8 tasks created for guest user.');
 }
 
 main()

@@ -15,7 +15,13 @@ export interface AuthenticatedRequest extends Request {
     id: string;
     email: string | null;
     name: string | null;
+    fullName: string | null;
+    title: string | null;
+    username: string | null;
+    avatarUrl: string | null;
     isGuest: boolean;
+    createdAt: Date;
+    updatedAt: Date;
   };
 }
 
@@ -50,7 +56,13 @@ export class SessionGuard implements CanActivate {
       id: user.id,
       email: user.email,
       name: user.name,
+      fullName: user.fullName,
+      title: user.title,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
       isGuest: user.isGuest,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
 
     return true;

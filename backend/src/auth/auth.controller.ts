@@ -31,7 +31,13 @@ export class AuthController {
       id: req.user!.id,
       email: req.user!.email,
       name: req.user!.name,
+      fullName: req.user!.fullName,
+      title: req.user!.title,
+      username: req.user!.username,
+      avatarUrl: req.user!.avatarUrl,
       isGuest: req.user!.isGuest,
+      createdAt: req.user!.createdAt,
+      updatedAt: req.user!.updatedAt,
     };
   }
 
@@ -76,6 +82,10 @@ export class AuthController {
         id: user.id,
         email: user.email,
         name: user.name,
+        fullName: user.fullName,
+        title: user.title,
+        username: user.username,
+        avatarUrl: user.avatarUrl,
         isGuest: user.isGuest,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
