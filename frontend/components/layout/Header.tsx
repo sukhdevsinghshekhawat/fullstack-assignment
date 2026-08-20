@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Menu, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 
@@ -30,6 +31,14 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         >
           {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </button>
+
+        <Link
+          href="/profile"
+          title="Profile"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-foreground hover:opacity-90"
+        >
+          <span className="sr-only">Open profile</span>
+        </Link>
       </div>
     </header>
   );
