@@ -5,47 +5,69 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import type { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-import { GuestLoginDto } from './dto/guest-login.dto';
-import { SESSION_COOKIE, SessionGuard } from './guards/session.guard';
-import type { AuthenticatedRequest } from './guards/session.guard';
+    try {
+      const cookieToken = (req.cookies?.[SESSION_COOKIE] as string) ?? undefined;
+      const bodyToken = dto.sessionToken;
 
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+      // Prefer an existing cookie; fall back to an explicit token from the body.
+      const existingToken = cookieToken ?? bodyToken;
 
-  /**
-   * GET /auth/me
-   *
-   * Returns the currently authenticated user from the session cookie.
-   */
-  @Get('me')
-  @UseGuards(SessionGuard)
-  me(@Req() req: AuthenticatedRequest) {
-    return {
-      id: req.user!.id,
-      email: req.user!.email,
-      name: req.user!.name,
-      fullName: req.user!.fullName,
-      title: req.user!.title,
-      username: req.user!.username,
-      avatarUrl: req.user!.avatarUrl,
-      isGuest: req.user!.isGuest,
-      createdAt: req.user!.createdAt,
-      updatedAt: req.user!.updatedAt,
-    };
-  }
+      const { user, sessionToken } = await this.authService.loginAsGuest(
+        existingToken,
+      );
 
-  /**
-   * POST /auth/guest
-   *
-   * Creates (or resumes) a guest session and stores the session
-   * token in an HTTP-only cookie. The cookie is not readable from
+      // Determine the request origin (fall back to FRONTEND_URLS first value)
+      const reqOrigin = (req.get('origin') as string) || (process.env.FRONTEND_URLS ?? process.env.FRONTEND_URL ?? 'http://localhost:3000').split(',')[0];
+      const isReqHttps = reqOrigin.startsWith('https://');
+
+      // If the request origin is an HTTPS frontend (e.g., Netlify), we must
+      // set SameSite=None and Secure to allow cross-site cookies. For local
+      // HTTP development, use SameSite=Lax.
+      res.cookie(SESSION_COOKIE, sessionToken, {
+        httpOnly: true,
+        sameSite: isReqHttps ? 'none' : 'lax',
+        secure: isReqHttps || process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        path: '/',
+      });
+
+      return {
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          fullName: user.fullName,
+          title: user.title,
+          username: user.username,
+          avatarUrl: user.avatarUrl,
+          isGuest: user.isGuest,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        message: 'Guest login successful',
+      };
+    } catch (err) {
+      // Log server-side for diagnostics
+      // eslint-disable-next-line no-console
+      console.error('Guest login failed:', err);
+
+      // If DEBUG=true, return the error message and stack in the response
+      if (process.env.DEBUG === 'true') {
+        const body: any = { statusCode: 500, message: 'Internal server error' };
+        if (err instanceof Error) {
+          body.error = err.message;
+          body.stack = err.stack;
+        } else {
+          body.error = String(err);
+        }
+        // send detailed info for debugging (only when DEBUG=true)
+        return res.status(500).json(body);
+      }
+
+      // Generic error for normal operation
+      return res.status(500).json({ statusCode: 500, message: 'Internal server error' });
+    }
    * client-side JavaScript, which keeps the token safe from XSS.
    */
   @Post('guest')
@@ -73,13 +95,17 @@ export class AuthController {
     //   (e.g., Netlify on HTTPS), we must use `None` and `secure: true`
     //   for the browser to send the cookie cross-site.
     // - `secure`: required when `sameSite: 'none'`; enable when using HTTPS.
-    const frontendOrigin = process.env.FRONTEND_URL ?? 'http://localhost:3000';
-    const isFrontendHttps = frontendOrigin.startsWith('https://');
+    // Determine the request origin (fall back to FRONTEND_URLS first value)
+    const reqOrigin = (req.get('origin') as string) || (process.env.FRONTEND_URLS ?? process.env.FRONTEND_URL ?? 'http://localhost:3000').split(',')[0];
+    const isReqHttps = reqOrigin.startsWith('https://');
 
+    // If the request origin is an HTTPS frontend (e.g., Netlify), we must
+    // set SameSite=None and Secure to allow cross-site cookies. For local
+    // HTTP development, use SameSite=Lax.
     res.cookie(SESSION_COOKIE, sessionToken, {
       httpOnly: true,
-      sameSite: isFrontendHttps ? 'none' : 'lax',
-      secure: isFrontendHttps || process.env.NODE_ENV === 'production',
+      sameSite: isReqHttps ? 'none' : 'lax',
+      secure: isReqHttps || process.env.NODE_ENV === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/',
     });
