@@ -67,11 +67,19 @@ export class AuthController {
 
     // Secure, HTTP-only, same-site cookie so the browser sends it
     // automatically on subsequent requests. `secure` is only enabled
-    // when NODE_ENV is production (HTTPS).
+    // Cookie options:
+    // - `httpOnly`: keep the token out of JavaScript (XSS-safe).
+    // - `sameSite`: when the frontend is served from a different origin
+    //   (e.g., Netlify on HTTPS), we must use `None` and `secure: true`
+    //   for the browser to send the cookie cross-site.
+    // - `secure`: required when `sameSite: 'none'`; enable when using HTTPS.
+    const frontendOrigin = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    const isFrontendHttps = frontendOrigin.startsWith('https://');
+
     res.cookie(SESSION_COOKIE, sessionToken, {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isFrontendHttps ? 'none' : 'lax',
+      secure: isFrontendHttps || process.env.NODE_ENV === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/',
     });
