@@ -46,11 +46,20 @@ export class AuthController {
         (process.env.FRONTEND_URLS ?? process.env.FRONTEND_URL ?? 'http://localhost:3000').split(',')[0];
       const isReqHttps = reqOrigin.startsWith('https://');
 
-      // Set cookie options appropriate for cross-site or local dev.
+      // Allow cross-site cookies for HTTPS frontends and local development
+      // (localhost). For cross-site cookies we must set `SameSite=None` and
+      // `Secure`. Setting `Secure=true` is fine because the response is
+      // delivered over HTTPS from Render; browsers will send the cookie on
+      // subsequent HTTPS requests from the page even if the page itself is
+      // served over HTTP during local development.
+      const allowCrossSite = isReqHttps || reqOrigin.includes('localhost');
+      const cookieSameSite: 'none' | 'lax' = allowCrossSite ? 'none' : 'lax';
+      const cookieSecure = allowCrossSite || process.env.NODE_ENV === 'production';
+
       res.cookie(SESSION_COOKIE, sessionToken, {
         httpOnly: true,
-        sameSite: isReqHttps ? 'none' : 'lax',
-        secure: isReqHttps || process.env.NODE_ENV === 'production',
+        sameSite: cookieSameSite,
+        secure: cookieSecure,
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         path: '/',
       });
