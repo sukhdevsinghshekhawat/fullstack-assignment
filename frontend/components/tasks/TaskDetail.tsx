@@ -58,6 +58,10 @@ export function TaskDetail({ taskId, currentUserId }: TaskDetailProps) {
   const [notFound, setNotFound] = useState(false);
   const [editingSubtask, setEditingSubtask] = useState<Task | null>(null);
   const [subtaskModalOpen, setSubtaskModalOpen] = useState(false);
+  const [taskLocked, setTaskLocked] = useState(false);
+  const [taskWatched, setTaskWatched] = useState(false);
+  const [showDetailsPanel, setShowDetailsPanel] = useState(true);
+  const [shareFeedback, setShareFeedback] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -276,6 +280,30 @@ export function TaskDetail({ taskId, currentUserId }: TaskDetailProps) {
     setResources((prev) => prev.filter((r) => r.id !== resourceId));
   };
 
+  const handleToggleLock = () => {
+    setTaskLocked((current) => !current);
+  };
+
+  const handleToggleWatch = () => {
+    setTaskWatched((current) => !current);
+  };
+
+  const handleShareTask = async () => {
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+    try {
+      if (shareUrl && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+      setShareFeedback(true);
+      window.setTimeout(() => setShareFeedback(false), 1500);
+    } catch {
+      if (shareUrl && typeof window !== 'undefined') {
+        window.prompt('Copy this task link:', shareUrl);
+      }
+    }
+  };
+
   // Loading skeleton
   if (loading) {
     return (
@@ -358,32 +386,54 @@ export function TaskDetail({ taskId, currentUserId }: TaskDetailProps) {
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <button
-                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                aria-label="Lock task"
+                type="button"
+                onClick={handleToggleLock}
+                className={`rounded-md p-2 transition-colors ${
+                  taskLocked
+                    ? 'bg-accent/10 text-accent hover:bg-accent/20'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+                aria-label={taskLocked ? 'Unlock task' : 'Lock task'}
+                title={taskLocked ? 'Unlock task' : 'Lock task'}
               >
                 <Lock className="h-4 w-4" />
               </button>
               <button
-                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                aria-label="Watch task"
+                type="button"
+                onClick={handleToggleWatch}
+                className={`rounded-md p-2 transition-colors ${
+                  taskWatched
+                    ? 'bg-accent/10 text-accent hover:bg-accent/20'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+                aria-label={taskWatched ? 'Unwatch task' : 'Watch task'}
+                title={taskWatched ? 'Unwatch task' : 'Watch task'}
               >
                 <Eye className="h-4 w-4" />
               </button>
               <button
-                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                aria-label="Share task"
+                type="button"
+                onClick={handleShareTask}
+                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={shareFeedback ? 'Link copied' : 'Share task'}
+                title={shareFeedback ? 'Link copied' : 'Share task'}
               >
                 <Share2 className="h-4 w-4" />
               </button>
               <button
-                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                type="button"
+                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="More actions"
+                title="More actions"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
               <button
-                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                aria-label="Toggle details panel"
+                type="button"
+                onClick={() => setShowDetailsPanel((current) => !current)}
+                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={showDetailsPanel ? 'Hide details panel' : 'Show details panel'}
+                title={showDetailsPanel ? 'Hide details panel' : 'Show details panel'}
               >
                 <PanelRight className="h-4 w-4" />
               </button>
@@ -438,24 +488,26 @@ export function TaskDetail({ taskId, currentUserId }: TaskDetailProps) {
       </div>
 
       {/* Right details panel */}
-      <div className="flex w-full lg:w-72 shrink-0 flex-col border-l border-border bg-surface">
-        <TaskDetailsPanel
-          task={task}
-          workspaceMembers={workspaceMembers}
-          teams={teams}
-          currentUserId={currentUserId}
-          onStatusChange={handleStatusChange}
-          onPriorityChange={handlePriorityChange}
-          onMembersChange={handleMembersChange}
-          onStartDateChange={handleStartDateChange}
-          onEndDateChange={handleEndDateChange}
-          onLabelsChange={handleLabelsChange}
-          onTeamChange={handleTeamChange}
-        />
-        <div className="border-t border-border p-4">
-          <TaskActivity activities={activities} />
+      {showDetailsPanel && (
+        <div className="flex w-full lg:w-72 shrink-0 flex-col border-l border-border bg-surface">
+          <TaskDetailsPanel
+            task={task}
+            workspaceMembers={workspaceMembers}
+            teams={teams}
+            currentUserId={currentUserId}
+            onStatusChange={handleStatusChange}
+            onPriorityChange={handlePriorityChange}
+            onMembersChange={handleMembersChange}
+            onStartDateChange={handleStartDateChange}
+            onEndDateChange={handleEndDateChange}
+            onLabelsChange={handleLabelsChange}
+            onTeamChange={handleTeamChange}
+          />
+          <div className="border-t border-border p-4">
+            <TaskActivity activities={activities} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Subtask edit modal */}
       <TaskModal
