@@ -15,6 +15,9 @@ CREATE TABLE "workspaces" (
 );
 
 -- CreateTable
+-- CreateEnum
+CREATE TYPE "WorkspaceMemberRole" AS ENUM ('OWNER', 'MEMBER');
+
 CREATE TABLE "workspace_members" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "workspaceId" UUID NOT NULL,

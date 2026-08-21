@@ -7,6 +7,7 @@ import {
 import type { Request } from 'express';
 import { guestSessions } from '../session-store';
 import { UsersService } from '../../users/users.service';
+import { SessionRepository } from '../session.repository';
 
 export const SESSION_COOKIE = 'taskflow_session';
 
@@ -32,7 +33,10 @@ export interface AuthenticatedRequest extends Request {
  */
 @Injectable()
 export class SessionGuard implements CanActivate {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly sessionRepository: SessionRepository,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
@@ -42,7 +46,15 @@ export class SessionGuard implements CanActivate {
       throw new UnauthorizedException('Not authenticated');
     }
 
-    const userId = guestSessions.get(token);
+    // Try DB-backed session first, then fallback to in-memory map.
+    let userId: string | undefined;
+    const record = await this.sessionRepository.find(token).catch(() => null);
+    if (record && (record as any).userId) {
+      userId = (record as any).userId;
+    } else {
+      userId = guestSessions.get(token);
+    }
+
     if (!userId) {
       throw new UnauthorizedException('Invalid or expired session');
     }

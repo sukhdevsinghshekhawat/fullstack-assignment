@@ -50,16 +50,17 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  createdTasks   Task[]       @relation("TaskCreator")
-  taskMembers    TaskMember[]
-  taskLabels     TaskLabel[]
-  comments       TaskComment[]
-  activities     TaskActivity[]
-  resources      TaskResource[]
-  teams          Team[]
-  createdProjects Project[]    @relation("ProjectCreator")
-  leadProjects   Project[]    @relation("ProjectLead")
+  createdTasks         Task[]            @relation("TaskCreator")
+  taskMembers          TaskMember[]
+  taskLabels           TaskLabel[]
+  comments             TaskComment[]
+  activities           TaskActivity[]
+  resources            TaskResource[]
+  teams                Team[]
+  createdProjects      Project[]         @relation("ProjectCreator")
+  leadProjects         Project[]         @relation("ProjectLead")
   workspaceMemberships WorkspaceMember[]
+  sessions             Session[]
 
   @@map("users")
 }
@@ -90,8 +91,8 @@ model Project {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  lead      User? @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
-  createdBy User  @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  lead      User?  @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
+  createdBy User   @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: Cascade)
   tasks     Task[]
 
   @@index([createdById])
@@ -101,33 +102,33 @@ model Project {
 }
 
 model Task {
-  id          String       @id @default(uuid()) @db.Uuid
-  title       String
-  description String?
-  status      TaskStatus   @default(TODO)
-  priority    TaskPriority @default(NO_PRIORITY)
-  dueDate     DateTime?
-  startDate   DateTime?
-  endDate     DateTime?
-  parentTaskId String?     @db.Uuid
-  projectId   String?      @db.Uuid
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id           String       @id @default(uuid()) @db.Uuid
+  title        String
+  description  String?
+  status       TaskStatus   @default(TODO)
+  priority     TaskPriority @default(NO_PRIORITY)
+  dueDate      DateTime?
+  startDate    DateTime?
+  endDate      DateTime?
+  parentTaskId String?      @db.Uuid
+  projectId    String?      @db.Uuid
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
-  createdById String       @db.Uuid
-  createdBy   User         @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String @db.Uuid
+  createdBy   User   @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
 
-  parentTask   Task?        @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
-  subTasks     Task[]       @relation("SubTasks")
-  project      Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  teamId       String?      @db.Uuid
-  team         Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  parentTask Task?    @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subTasks   Task[]   @relation("SubTasks")
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  teamId     String?  @db.Uuid
+  team       Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
-  members   TaskMember[]
-  labels    TaskLabel[]
-  comments  TaskComment[]
+  members    TaskMember[]
+  labels     TaskLabel[]
+  comments   TaskComment[]
   activities TaskActivity[]
-  resources TaskResource[]
+  resources  TaskResource[]
 
   @@index([createdById, status])
   @@index([createdById, priority])
@@ -193,17 +194,17 @@ model TaskResource {
 }
 
 model TaskComment {
-  id              String    @id @default(uuid()) @db.Uuid
-  taskId          String    @db.Uuid
-  userId          String    @db.Uuid
+  id              String   @id @default(uuid()) @db.Uuid
+  taskId          String   @db.Uuid
+  userId          String   @db.Uuid
   content         String
-  parentCommentId String?   @db.Uuid
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  parentCommentId String?  @db.Uuid
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  task   Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent TaskComment? @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  task    Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  TaskComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
   replies TaskComment[] @relation("CommentReplies")
 
   @@index([taskId])
@@ -243,11 +244,11 @@ model Workspace {
 }
 
 model WorkspaceMember {
-  id        String             @id @default(uuid()) @db.Uuid
-  workspaceId String           @db.Uuid
-  userId      String           @db.Uuid
+  id          String              @id @default(uuid()) @db.Uuid
+  workspaceId String              @db.Uuid
+  userId      String              @db.Uuid
   role        WorkspaceMemberRole @default(MEMBER)
-  joinedAt    DateTime         @default(now())
+  joinedAt    DateTime            @default(now())
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -255,4 +256,16 @@ model WorkspaceMember {
   @@unique([workspaceId, userId])
   @@index([userId])
   @@map("workspace_members")
+}
+
+// Persistent session store for guest sessions.
+// Stores a session token mapped to a user so sessions survive server restarts.
+model Session {
+  token     String   @id
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
