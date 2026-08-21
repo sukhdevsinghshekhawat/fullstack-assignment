@@ -175,6 +175,66 @@ cd backend && npm run start:dev
 cd frontend && npm run dev
 ```
 
+## Keeping Render Active (Prevent Sleep Mode)
+
+Render's free tier puts your backend to sleep after **15 minutes of inactivity**. When a request comes in after that, it takes time to wake up. Here's how to keep it always active:
+
+### 1. Client-side Keep-Alive (already implemented)
+
+A `KeepAlive` component is mounted in the root layout (`frontend/app/layout.tsx`). It pings the backend `/health` endpoint every **10 minutes** while the app is open in a browser.
+
+- File: `frontend/components/keepalive/KeepAlive.tsx`
+- Pings: `GET {NEXT_PUBLIC_API_URL}/health`
+- Interval: 10 minutes
+
+> **Note:** This only works while a browser tab is open. For 24/7 uptime, also set up an external monitor (below).
+
+### 2. External Uptime Monitor (recommended for 24/7)
+
+Use a free uptime monitoring service to ping your backend every 5 minutes, 24/7. This keeps Render awake even when no one has the app open.
+
+#### Option A — UptimeRobot (free)
+
+1. Go to [uptimerobot.com](https://uptimerobot.com) and create a free account.
+2. Click **+ Add New Monitor**.
+3. Set:
+   - **Monitor Type:** HTTP(S)
+   - **Friendly Name:** `TaskFlow Backend`
+   - **URL (or IP):** `https://your-backend.onrender.com/health`
+   - **Monitoring Interval:** 5 minutes
+4. Click **Create Monitor**.
+
+#### Option B — cron-job.org (free, no account needed for basic use)
+
+1. Go to [cron-job.org](https://cron-job.org).
+2. Create a free account.
+3. Click **+ Create cronjob**.
+4. Set:
+   - **Title:** `TaskFlow Backend Keep-Alive`
+   - **URL:** `https://your-backend.onrender.com/health`
+   - **Schedule:** Every 5 minutes
+5. Save the cronjob.
+
+#### Option C — Better Stack Uptime (free)
+
+1. Go to [betterstack.com/uptime](https://betterstack.com/uptime).
+2. Create a free account.
+3. Add a new monitor with URL `https://your-backend.onrender.com/health`.
+4. Set check interval to 5 minutes.
+
+### 3. Render Dashboard Settings
+
+In your Render dashboard, you can also reduce cold-start impact:
+
+- **Web Service → Settings → Health Check Path:** set to `/health`
+- This lets Render know the service is healthy and can restart it if it becomes unresponsive.
+
+### 4. Backend Health Endpoint
+
+The backend already exposes a lightweight health check at `GET /health` (see `backend/src/app.controller.ts`). It returns a simple JSON response without touching the database, so it's cheap to call frequently.
+
+---
+
 ## API
 
 ### `POST /auth/guest`
