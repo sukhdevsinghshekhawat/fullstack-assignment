@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
@@ -14,18 +16,31 @@ export default function KeepAlive() {
     if (!process.env.NEXT_PUBLIC_API_URL) return;
 
     const pingBackend = async () => {
+      const startTime = Date.now();
       try {
         const response = await fetch(`${API_URL}/health`, {
           method: 'GET',
           cache: 'no-store',
         });
+        const responseTime = Date.now() - startTime;
         if (response.ok) {
-          console.log('[KeepAlive] Backend is awake:', new Date().toISOString());
+          console.log(
+            `%c[KeepAlive] ✅ Ping successful — ${new Date().toLocaleTimeString()} — Status: ${response.status} — Response time: ${responseTime}ms`,
+            'color: green; font-weight: bold;'
+          );
         } else {
-          console.warn('[KeepAlive] Backend responded with status:', response.status);
+          console.warn(
+            `%c[KeepAlive] ⚠️ Ping responded with status: ${response.status} — ${new Date().toLocaleTimeString()}`,
+            'color: orange; font-weight: bold;'
+          );
         }
       } catch (error) {
-        console.error('[KeepAlive] Failed to ping backend:', error);
+        const responseTime = Date.now() - startTime;
+        console.error(
+          `%c[KeepAlive] ❌ Ping failed — ${new Date().toLocaleTimeString()} — Response time: ${responseTime}ms`,
+          'color: red; font-weight: bold;',
+          error
+        );
       }
     };
 
