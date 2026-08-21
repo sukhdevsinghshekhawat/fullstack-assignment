@@ -10,6 +10,8 @@ import { getProjects, createProject, updateProject, deleteProject } from '@/lib/
 import type { Project, ProjectQuery, ProjectPriority } from '@/types/project';
 import { getCurrentUser } from '@/lib/auth';
 import type { GuestUser } from '@/types/auth';
+import { getWorkspaceMembers } from '@/lib/tasks';
+import type { TaskMember } from '@/types/task';
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -20,6 +22,7 @@ export default function ProjectsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [currentUser, setCurrentUser] = useState<GuestUser | null>(null);
+  const [workspaceMembers, setWorkspaceMembers] = useState<TaskMember[]>([]);
 
   const fetchProjects = useCallback(async (nextQuery: ProjectQuery = {}) => {
     setLoading(true);
@@ -36,6 +39,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     getCurrentUser().then(setCurrentUser).catch(() => router.push('/login'));
+    getWorkspaceMembers().then(setWorkspaceMembers).catch(() => setWorkspaceMembers([]));
     fetchProjects();
   }, [fetchProjects, router]);
 
@@ -151,6 +155,7 @@ export default function ProjectsPage() {
       <ProjectModal
         visible={modalOpen}
         project={editingProject}
+        members={workspaceMembers}
         onClose={() => {
           setModalOpen(false);
           setEditingProject(null);

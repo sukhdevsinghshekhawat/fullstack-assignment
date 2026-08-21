@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { Project, ProjectPriority } from '@/types/project';
+import type { TaskMember } from '@/types/task';
 
 interface ProjectModalProps {
   visible: boolean;
   onClose: () => void;
   project?: Project | null;
+  members?: TaskMember[];
   onSubmit: (input: {
     name: string;
     description?: string;
@@ -25,7 +27,7 @@ const priorities: { value: ProjectPriority; label: string }[] = [
   { value: 'LOW', label: 'Low' },
 ];
 
-export function ProjectModal({ visible, onClose, project, onSubmit }: ProjectModalProps) {
+export function ProjectModal({ visible, onClose, project, members = [], onSubmit }: ProjectModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<ProjectPriority>('NO_PRIORITY');
@@ -148,6 +150,25 @@ export function ProjectModal({ visible, onClose, project, onSubmit }: ProjectMod
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="project-lead" className="mb-1 block text-sm font-medium text-foreground">
+              Project Lead
+            </label>
+            <select
+              id="project-lead"
+              value={leadId}
+              onChange={(e) => setLeadId(e.target.value)}
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="">No lead</option>
+              {members.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.name || member.email || 'Unknown user'}
+                </option>
+              ))}
+            </select>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}

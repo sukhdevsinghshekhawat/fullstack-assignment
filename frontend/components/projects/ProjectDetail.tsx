@@ -14,7 +14,8 @@ import { TaskSearch } from '@/components/tasks/TaskSearch';
 import { TaskFilterMenu } from '@/components/tasks/TaskFilterMenu';
 import { TaskFieldsMenu, type FieldVisibility } from '@/components/tasks/TaskFieldsMenu';
 import { getProject, getProjectTasks, updateProject, deleteProject } from '@/lib/projects';
-import { createTask, updateTask, deleteTask } from '@/lib/tasks';
+import { createTask, getWorkspaceMembers, updateTask, deleteTask } from '@/lib/tasks';
+import type { TaskMember } from '@/types/task';
 
 interface ProjectDetailProps {
   projectId: string;
@@ -45,6 +46,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [workspaceMembers, setWorkspaceMembers] = useState<TaskMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -91,6 +93,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
 
   useEffect(() => {
     fetchProject();
+    getWorkspaceMembers().then(setWorkspaceMembers).catch(() => setWorkspaceMembers([]));
   }, [fetchProject]);
 
   useEffect(() => {
@@ -421,6 +424,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
       <ProjectModal
         visible={projectModalOpen}
         project={project}
+        members={workspaceMembers}
         onClose={() => setProjectModalOpen(false)}
         onSubmit={handleProjectUpdate}
       />
