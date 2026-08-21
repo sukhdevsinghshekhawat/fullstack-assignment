@@ -181,11 +181,11 @@ Render's free tier puts your backend to sleep after **15 minutes of inactivity**
 
 ### 1. Client-side Keep-Alive (already implemented)
 
-A `KeepAlive` component is mounted in the root layout (`frontend/app/layout.tsx`). It pings the backend `/health` endpoint every **10 minutes** while the app is open in a browser.
+A `KeepAlive` component is mounted in the root layout (`frontend/app/layout.tsx`). It pings the backend `/health` endpoint every **3 minutes** while the app is open in a browser.
 
 - File: `frontend/components/keepalive/KeepAlive.tsx`
 - Pings: `GET {NEXT_PUBLIC_API_URL}/health`
-- Interval: 10 minutes
+- Interval: 3 minutes
 
 > **Note:** This only works while a browser tab is open. For 24/7 uptime, also set up an external monitor (below).
 
