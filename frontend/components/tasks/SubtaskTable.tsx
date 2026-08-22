@@ -46,7 +46,7 @@ function SubtaskActions({
     <div className="relative inline-block" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="rounded-md p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-opacity"
+        className="rounded-md p-1 text-muted-foreground opacity-100 sm:opacity-0 group-hover:opacity-100 hover:text-foreground transition-opacity"
         aria-label={`Actions for ${subtask.title}`}
         aria-haspopup="menu"
         aria-expanded={open}

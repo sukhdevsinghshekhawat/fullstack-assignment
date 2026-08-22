@@ -32,7 +32,7 @@ export function TaskFieldsMenu({ visible, onClose, fields, onToggle, view, onVie
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-200 scale-100"
+        className="bg-surface rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6 mx-4 transform transition-transform duration-200 scale-100"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">

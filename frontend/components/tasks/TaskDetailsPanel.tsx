@@ -56,7 +56,7 @@ export function TaskDetailsPanel({
   };
 
   return (
-    <div className="w-full lg:w-72 shrink-0 border-l border-border bg-surface p-4 space-y-5">
+    <div className="w-full lg:w-72 shrink-0 lg:border-l border-border bg-surface p-4 space-y-5">
       <h2 className="text-sm font-semibold text-foreground">Details</h2>
 
       {/* Status */}
@@ -85,7 +85,7 @@ export function TaskDetailsPanel({
       {/* Dates */}
       <div className="space-y-1.5">
         <p className="text-xs font-medium text-muted-foreground">Dates</p>
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5">
           <TaskDatePicker value={task.startDate} onChange={onStartDateChange} placeholder="Start" />
           <span className="text-muted-foreground">→</span>
           <TaskDatePicker value={task.endDate} onChange={onEndDateChange} placeholder="End" />

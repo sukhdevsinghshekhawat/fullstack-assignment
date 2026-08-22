@@ -93,10 +93,17 @@ export default function ProjectsPage() {
   return (
     <AppShell>
       <div className="min-h-0 flex-1 overflow-auto">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h1 className="text-lg font-semibold text-foreground">Projects</h1>
-
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 border-b border-border px-4 py-4 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-lg font-semibold text-foreground">Projects</h1>
+            <button
+              onClick={() => handleEdit(null)}
+              className="h-9 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+            >
+              + Add Project
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
             <button className="flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm text-foreground hover:bg-muted" aria-label="Search projects">
               <Search className="h-4 w-4" />
             </button>
@@ -105,12 +112,6 @@ export default function ProjectsPage() {
             </button>
             <button className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground hover:bg-muted">
               Filter
-            </button>
-            <button
-              onClick={() => handleEdit(null)}
-              className="h-9 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-            >
-              + Add Project
             </button>
           </div>
         </div>

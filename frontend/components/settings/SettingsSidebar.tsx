@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronLeft, Droplet, Palette, User } from 'lucide-react';
+import { ChevronLeft, Droplet, Palette, User, X } from 'lucide-react';
 
 interface SettingsSidebarProps {
   collapsed?: boolean;
+  onClose?: () => void;
 }
 
 const navItems = [
@@ -14,7 +15,7 @@ const navItems = [
   { href: '/profile/color', label: 'Color', icon: Droplet },
 ];
 
-export function SettingsSidebar({ collapsed = false }: SettingsSidebarProps) {
+export function SettingsSidebar({ collapsed = false, onClose }: SettingsSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -28,6 +29,15 @@ export function SettingsSidebar({ collapsed = false }: SettingsSidebarProps) {
         {!collapsed && (
           <span className="text-lg font-semibold text-foreground">Settings</span>
         )}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="ml-auto rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+            aria-label="Close settings navigation"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto py-4">
@@ -39,6 +49,7 @@ export function SettingsSidebar({ collapsed = false }: SettingsSidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onClose}
                 title={item.label}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive

@@ -39,7 +39,7 @@ export function WorkspaceAccess({ workspaces, onLeave, leaving }: WorkspaceAcces
         {workspaces.map((membership) => (
           <div
             key={membership.id}
-            className="flex items-center justify-between rounded-lg border border-border bg-surface p-3"
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-surface p-3"
           >
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">
@@ -70,7 +70,7 @@ export function WorkspaceAccess({ workspaces, onLeave, leaving }: WorkspaceAcces
       {/* Confirmation Modal */}
       {confirmWorkspaceId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-4 sm:p-6 mx-4 shadow-lg">
             <h3 className="text-lg font-semibold text-foreground">
               Leave workspace?
             </h3>

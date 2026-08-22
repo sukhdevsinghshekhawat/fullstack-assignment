@@ -5,20 +5,28 @@ import { TaskColumn } from './TaskColumn';
 
 interface TaskBoardProps {
   tasks: Task[];
-  onStatusChange: (taskId: string, newStatus: TaskStatus) => void;
-  onAddTask: (status: TaskStatus) => void;
+  onStatusChange: (taskId: string, status: TaskStatus) => void;
+  onAddTask: (status?: TaskStatus) => void;
 }
+
+const STATUS_GROUPS: { status: TaskStatus; label: string }[] = [
+  { status: 'TODO', label: 'To Do' },
+  { status: 'DOING', label: 'Doing' },
+  { status: 'COMPLETED', label: 'Completed' },
+  { status: 'ON_HOLD', label: 'On Hold' },
+];
 
 export function TaskBoard({ tasks, onStatusChange, onAddTask }: TaskBoardProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-      {(['TODO', 'DOING', 'COMPLETED', 'ON_HOLD'] as const).map((status) => (
+    <div className="flex gap-4 overflow-x-auto pb-4">
+      {STATUS_GROUPS.map((group) => (
         <TaskColumn
-          key={status}
-          status={status}
-          tasks={tasks.filter((t) => t.status === status)}
+          key={group.status}
+          status={group.status}
+          label={group.label}
+          tasks={tasks.filter((t) => t.status === group.status)}
           onTaskMove={(taskId, newStatus) => onStatusChange(taskId, newStatus)}
-          onAddTask={() => onAddTask(status)}
+          onAddTask={() => onAddTask(group.status)}
         />
       ))}
     </div>

@@ -82,7 +82,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <SettingsLayout>
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="max-w-2xl space-y-6">
             <div className="h-7 w-32 animate-pulse rounded bg-muted" />
             <div className="flex justify-center">
@@ -105,7 +105,7 @@ export default function ProfilePage() {
   if (error) {
     return (
       <SettingsLayout>
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="max-w-2xl">
             <div className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <span>{error}</span>
@@ -126,7 +126,7 @@ export default function ProfilePage() {
 
   return (
     <SettingsLayout>
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-2xl space-y-8">
           <h1 className="text-xl font-semibold text-foreground">Profile</h1>
 

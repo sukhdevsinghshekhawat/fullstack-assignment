@@ -25,7 +25,7 @@ export function TaskTable({ tasks, fields, onEdit, onDelete, onAddTask }: TaskTa
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
+      <table className="w-full min-w-[600px] border-collapse">
         <thead>
           <TaskTableHeader fields={fields} />
         </thead>

@@ -21,7 +21,7 @@ export function ProjectTable({ projects, onOpenProject, onEdit, onDelete }: Proj
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-surface">
       <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
+        <table className="min-w-[600px] w-full text-left text-sm">
           <thead className="border-b border-border bg-muted/30">
             <tr>
               <th className="px-4 py-3 font-medium text-foreground">Projects</th>

@@ -15,7 +15,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onMove }: TaskCardProps) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50">
+    <div className="rounded-lg border border-border bg-card p-3 sm:p-4 transition-colors hover:bg-muted/50">
       <div className="flex flex-col gap-2">
         <Link href={`/tasks/${task.id}`} className="font-medium text-foreground line-clamp-2 hover:text-accent transition-colors">
           {task.title}

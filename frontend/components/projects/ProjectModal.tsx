@@ -81,7 +81,7 @@ export function ProjectModal({ visible, onClose, project, members = [], onSubmit
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-md rounded-lg bg-surface p-4 sm:p-6 mx-4 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
