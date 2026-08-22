@@ -37,7 +37,7 @@ export function TaskActions({ task, onEdit, onDelete }: TaskActionsProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setMenuOpen((o) => !o)}
-        className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground focus:opacity-100"
+        className="rounded-md p-1 text-muted-foreground opacity-100 sm:opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground focus:opacity-100"
         aria-label={`Actions for ${task.title}`}
         aria-haspopup="menu"
         aria-expanded={menuOpen}
@@ -47,7 +47,7 @@ export function TaskActions({ task, onEdit, onDelete }: TaskActionsProps) {
       {menuOpen && (
         <div
           role="menu"
-          className="absolute right-0 top-full mt-1 w-32 rounded-md bg-white shadow-dropdown border border-border py-1 z-10"
+          className="absolute right-0 top-full mt-1 w-32 rounded-md bg-surface shadow-dropdown border border-border py-1 z-10"
         >
           <button
             role="menuitem"
@@ -55,7 +55,7 @@ export function TaskActions({ task, onEdit, onDelete }: TaskActionsProps) {
               setMenuOpen(false);
               onEdit(task);
             }}
-            className="w-full px-3 py-1.5 text-xs text-left text-gray-700 hover:bg-gray-100"
+            className="w-full px-3 py-1.5 text-xs text-left text-foreground hover:bg-muted"
           >
             Edit
           </button>
@@ -65,7 +65,7 @@ export function TaskActions({ task, onEdit, onDelete }: TaskActionsProps) {
               setMenuOpen(false);
               onDelete(task.id);
             }}
-            className="w-full px-3 py-1.5 text-xs text-left text-red-600 hover:bg-red-50"
+            className="w-full px-3 py-1.5 text-xs text-left text-destructive hover:bg-destructive/10"
           >
             Delete
           </button>

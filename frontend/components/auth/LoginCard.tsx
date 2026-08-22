@@ -33,7 +33,7 @@ export function LoginCard() {
 
   return (
     <div className="w-full max-w-sm">
-      <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-8 shadow-sm">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           Let's get back on track
         </h1>
@@ -44,7 +44,7 @@ export function LoginCard() {
         {error && (
           <div
             role="alert"
-            className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
             {error}
           </div>

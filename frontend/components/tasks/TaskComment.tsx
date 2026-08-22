@@ -70,7 +70,7 @@ export function TaskComment({
   };
 
   return (
-    <div className={`space-y-2 ${depth > 0 ? 'ml-8' : ''}`}>
+    <div className={`space-y-2 ${depth > 0 ? 'ml-4 sm:ml-8' : ''}`}>
       <div className="flex items-start gap-2.5">
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
           {(comment.user.name || comment.user.email || '?').charAt(0).toUpperCase()}

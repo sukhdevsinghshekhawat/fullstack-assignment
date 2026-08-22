@@ -162,12 +162,22 @@ function TasksContent() {
     <AppShell>
       <div className="min-h-0 flex-1 overflow-auto">
         {/* Tasks Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-semibold text-foreground">Tasks</h1>
-            <TaskViewSwitcher view={view} onViewChange={handleViewChange} />
+        <div className="flex flex-col gap-3 px-4 py-4 border-b border-border sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-semibold text-foreground">Tasks</h1>
+              <TaskViewSwitcher view={view} onViewChange={handleViewChange} />
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleAddTask()}
+                className="h-9 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+              >
+                + Add Task
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <TaskSearch value={searchInput} onChange={setSearchInput} />
             <button
               onClick={() => setFieldsOpen(true)}
@@ -180,12 +190,6 @@ function TasksContent() {
               className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground hover:bg-muted"
             >
               Filter
-            </button>
-            <button
-              onClick={() => handleAddTask()}
-              className="h-9 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-            >
-              + Add Task
             </button>
           </div>
         </div>

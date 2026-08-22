@@ -50,7 +50,7 @@ export function TaskResources({ resources, onAdd, onDelete }: TaskResourcesProps
       {resources.length > 0 && (
         <ul className="space-y-1.5">
           {resources.map((r) => (
-            <li key={r.id} className="group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50 transition-colors">
+            <li key={r.id} className="group flex flex-wrap sm:flex-nowrap items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50 transition-colors">
               <Link2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
               <a
                 href={r.url}

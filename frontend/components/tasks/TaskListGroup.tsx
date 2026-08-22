@@ -31,7 +31,7 @@ export function TaskListGroup({
     <div className="mb-6">
       {/* Group Header */}
       <div
-        className="flex items-center justify-between px-4 py-2 cursor-pointer select-none hover:bg-muted/20 rounded-lg transition-colors"
+        className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 cursor-pointer select-none hover:bg-muted/20 rounded-lg transition-colors"
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-2">

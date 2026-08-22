@@ -93,7 +93,7 @@ export function TaskSubtasks({
           onClick={() => setModalOpen(false)}
         >
           <div
-            className="bg-surface rounded-lg shadow-xl w-full max-w-md p-6"
+            className="bg-surface rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6 mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">

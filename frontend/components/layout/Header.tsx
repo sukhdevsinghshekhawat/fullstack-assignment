@@ -12,7 +12,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4">
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-3 sm:px-4">
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleSidebar}
@@ -23,7 +23,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <button
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"

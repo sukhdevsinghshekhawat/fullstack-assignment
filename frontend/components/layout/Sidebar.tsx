@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CheckSquare, FolderKanban } from 'lucide-react';
+import { CheckSquare, FolderKanban, X } from 'lucide-react';
 import { PyramidLogo } from '@/components/logo/PyramidLogo';
 
 interface SidebarProps {
   collapsed: boolean;
+  onClose?: () => void;
 }
 
 const navItems = [
@@ -14,7 +15,7 @@ const navItems = [
   { href: '/projects', label: 'Projects', icon: FolderKanban },
 ];
 
-export function Sidebar({ collapsed }: SidebarProps) {
+export function Sidebar({ collapsed, onClose }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -32,6 +33,15 @@ export function Sidebar({ collapsed }: SidebarProps) {
             <PyramidLogo className="h-7 w-7" />
             <span className="text-lg font-semibold text-foreground">TaskFlow</span>
           </div>
+        )}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="ml-auto rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="h-4 w-4" />
+          </button>
         )}
       </div>
 
@@ -53,6 +63,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onClose}
                 title={item.label}
                 className={`flex items-center gap-3 rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                   isActive

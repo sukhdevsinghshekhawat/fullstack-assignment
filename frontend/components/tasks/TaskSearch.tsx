@@ -16,7 +16,7 @@ export function TaskSearch({ value, onChange, placeholder = 'Search...' }: TaskS
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 w-48 rounded-lg border border-border bg-background px-3 pl-8 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+        className="h-9 w-full sm:w-48 rounded-lg border border-border bg-background px-3 pl-8 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
         aria-label="Search tasks"
       />
       <Search

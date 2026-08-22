@@ -273,7 +273,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
   return (
     <div className="min-h-0 flex-1 overflow-auto">
       {/* Project Header */}
-      <div className="border-b border-border px-6 py-4">
+      <div className="border-b border-border px-4 py-4 sm:px-6">
         {/* Breadcrumb / Back */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <button
@@ -332,7 +332,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
       </div>
 
       {/* Tasks Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
           <TaskSearch value={searchInput} onChange={setSearchInput} placeholder="Search tasks..." />
           <button
@@ -370,7 +370,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
       )}
 
       {/* Task Groups */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {filteredTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
             <p className="text-base font-medium text-foreground">No tasks in this project.</p>
